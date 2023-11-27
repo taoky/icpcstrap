@@ -1,0 +1,6 @@
+[Unit]
+Description=ICPC heartbeat
+
+[Service]
+Type=oneshot
+ExecStart=/opt/heartbeat

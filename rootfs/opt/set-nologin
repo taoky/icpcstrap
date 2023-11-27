@@ -1,0 +1,4 @@
+#!/bin/bash -x
+
+cp /etc/gdm3/custom-nologin.conf /etc/gdm3/custom.conf && \
+    systemctl restart gdm

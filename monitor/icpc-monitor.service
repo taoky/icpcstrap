@@ -1,0 +1,40 @@
+[Unit]
+Description=ICPC Monitor web service
+Requires=network-online.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=3sec
+ExecStart=/usr/local/bin/icpc-monitor -c /etc/icpc-monitor/config.json
+ExecStop=/bin/kill -SIGQUIT $MAINPID
+ExecReload=/bin/kill -SIGHUP $MAINPID
+KillSignal=SIGTERM
+
+# Stop trying to restart the service if it restarts too many times in a row
+StartLimitInterval=1min
+StartLimitBurst=6
+
+StandardOutput=journal
+StandardError=journal
+StandardInput=null
+
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+TemporaryFileSystem=/run
+TemporaryFileSystem=/var:ro
+BindPaths=/var/lib/icpc-monitor
+
+PrivateUsers=true
+
+NoNewPrivileges=true
+ConfigurationDirectory=icpc-monitor
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target

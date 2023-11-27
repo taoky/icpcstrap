@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=DOMjudge
+Comment=Open DOMjudge
+Exec=sh -c 'xdg-open $SUBMITBASEURL'
+Icon=firefox

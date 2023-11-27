@@ -1,0 +1,8 @@
+network:
+  version: 2
+  wifis:
+    wlp1s0:  # 假设对应机器无线网卡名称是这个
+      dhcp4: true
+      access-points:
+        "%ICPCSSID%":  # SSID
+          password: "%ICPCPASS%"  # 密码

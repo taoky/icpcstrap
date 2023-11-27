@@ -1,0 +1,17 @@
+# diff
+
+南京站镜像与 WF 1005 image 的差异（**仅包含变化的文件名，不含文件内容**）。
+
+- iso-diff: iso 文件解包之后的差异
+- squashfs-diff: squashfs 文件解包之后的差异
+
+## iso
+
+- grub 设置默认启动项为 wipe disk
+- 无人值守安装设置时区、默认格式化为 ext4
+
+## squashfs
+
+- 添加 GID=3000 的 teams 组
+- 默认网络使用 systemd-networkd（配置由 netplan 生成）
+- 添加了一个 WebRTC 客户端（未使用）

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <title>ICPC Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://pxe.ustc.edu.cn/static/bootstrap.min.css">
+    <style>
+      .table thead th, .table tbody td { padding: 0.2rem; color: black !important; border-color: black !important; }
+      .table thead th { border-bottom: none; }
+    </style>
+  </head>
+  <body class="d-flex flex-column min-vh-100">
+    <div class="container-fluid container-xl table-responsive flex-grow-1 py-3">
+      <table class="table table-hover text-nowrap mb-0" border="1">
+        <thead class="thead-light text-black">
+          <tr>
+            <th>Seat</th>
+            <th>Version</th>
+            <th>MAC address</th>
+            <th>IP address</th>
+            <th>Last ping</th>
+            <th>Uptime</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .}}
+          <tr>
+            <td>{{.Name}}</td>
+            <td>{{.Version}}</td>
+            <td>{{.Mac}}</td>
+            <td>{{.IP}}</td>
+            <td>{{.TimeStr}}</td>
+            <td>{{.UptimeStr}}</td>
+            {{if eq .Status "ok"}}
+              <td class="table-success">OK</td>
+            {{else if eq .Status "down"}}
+              <td class="table-danger">Down</td>
+            {{else}}
+              <td class="table-secondary">Unknown</td>
+            {{end}}
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

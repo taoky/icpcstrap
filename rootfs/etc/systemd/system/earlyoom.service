@@ -1,0 +1,18 @@
+[Unit]
+Description=Early OOM Daemon in ICPC environment
+Documentation=man:earlyoom(1) https://github.com/rfjakob/earlyoom
+# Modified from https://github.com/USTC-vlab/deb/tree/master/vlab-earlyoom
+
+[Service]
+EnvironmentFile=-/etc/default/earlyoom
+ExecStart=/opt/earlyoom $EARLYOOM_ARGS
+# earlyoom never exits on it's own, so have systemd
+# restart it should it get killed for some reason.
+Restart=always
+# set memory limits and max tasks number
+TasksMax=10
+MemoryMax=50M
+
+[Install]
+WantedBy=multi-user.target
+Alias=earlyoom.service

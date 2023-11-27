@@ -1,0 +1,232 @@
+#!/bin/bash
+
+set -e
+[[ $DEBUG = true ]] && set -x
+
+BASE="$(dirname "$0")"
+SRC="$BASE/rootfs"
+DST=/target
+INPUT=/input.iso
+cd "$BASE"
+DSTROOTFS="$DST/edit"
+
+# "$DST": 中间产物和最终结果的存放目录
+# "$DST"/isomount: 挂载原始 ISO 的目录
+# "$DST"/extracted: 从原始 ISO 中提取出来的文件（不含 squashfs）
+# "$DST"/edit: 或者 "$DSTROOTFS"，是 squashfs 解压后的文件（rootfs）
+
+run() {
+  chroot "$DSTROOTFS" "$@"
+}
+
+add_file() {
+  while [ "$#" -ne 0 ]; do
+    rsync -rlp "$SRC/$1" "$DSTROOTFS/$1"
+    shift
+  done
+}
+
+add_package() {
+  DEBIAN_FRONTEND=noninteractive run apt-get install -y --no-install-recommends "$@"
+}
+
+remove_package() {
+  DEBIAN_FRONTEND=noninteractive run apt-get purge -y --autoremove "$@"
+}
+
+umount_inside_rootfs() {
+  umount "$DSTROOTFS/dev/pts"
+  umount "$DSTROOTFS/dev"
+  umount "$DSTROOTFS/proc"
+  umount "$DSTROOTFS/run"
+  umount "$DSTROOTFS/sys"
+  umount "$DSTROOTFS/tmp"
+}
+
+cleanup() {
+  if [[ $DEBUG = true ]]; then
+    echo "A working shell before cleanup..." >&2
+    /bin/bash
+  fi
+  umount_inside_rootfs || true
+
+  # loop mount
+  umount "$DST"/isomount || true
+}
+trap cleanup EXIT
+
+# extract ISO
+mkdir -p "$DST"/isomount
+mount -o loop "$INPUT" "$DST"/isomount
+mkdir -p "$DST"/extracted
+rsync --exclude=/casper/filesystem.squashfs -a --delete "$DST"/isomount/ "$DST"/extracted
+
+if test "$(ls -1A "$DST" | grep -v isomount | grep -v extracted | grep -v edit-original | wc -l)" -ne 0; then
+  echo "Target directory is not empty!" >&2
+  if [[ $DEBUG != true ]]; then
+    exit 1
+  fi
+fi
+
+# extract squashfs (slow)
+case "$COPY_FROM_ORIGINAL" in
+  true)
+    cp --reflink -a "$DST"/edit-original "$DSTROOTFS"
+    ;;
+  rsync)
+    rsync -aHAXx "$DST"/edit-original/ "$DSTROOTFS"/
+    ;;
+  *)
+    unsquashfs -d "$DST"/edit "$DST"/isomount/casper/filesystem.squashfs
+    ;;
+esac
+
+mount_all() {
+  mount -t tmpfs none "$DSTROOTFS/dev"
+  chmod 755 "$DSTROOTFS/dev"
+  mknod -m0666 "$DSTROOTFS/dev/null" c 1 3
+  mknod -m0666 "$DSTROOTFS/dev/random" c 1 8
+  mknod -m0666 "$DSTROOTFS/dev/urandom" c 1 9
+  mknod -m0666 "$DSTROOTFS/dev/zero" c 1 5
+  ln -sf /proc/self/fd/0 "$DSTROOTFS/dev/stdin"
+  ln -sf /proc/self/fd/1 "$DSTROOTFS/dev/stdout"
+  ln -sf /proc/self/fd/2 "$DSTROOTFS/dev/stderr"
+  mkdir -p "$DSTROOTFS/dev/pts"
+  mount -t devpts none "$DSTROOTFS/dev/pts"
+  mount -t proc proc "$DSTROOTFS/proc"
+  mount -t tmpfs none "$DSTROOTFS/run"
+  mount -t sysfs sys "$DSTROOTFS/sys"
+  mount -t tmpfs none "$DSTROOTFS/tmp"
+  mkdir -p "${DSTROOTFS}/run/systemd/resolve"
+  cp "/etc/resolv.conf" "${DSTROOTFS}/run/systemd/resolve/stub-resolv.conf"
+}
+
+mount_all
+
+# root password
+if [ -n "$ROOT_PASSWORD" ]; then
+  echo "Using root password from environment"
+else
+  ROOT_PASSWORD="$(head -c 12 /dev/urandom | base64)"
+  echo "Root password not specified, using \"$ROOT_PASSWORD\""
+fi
+
+VERSION="icpc2023-hefei-$(date +%y%m%d%H%M%S)"
+echo "$VERSION" > "$DSTROOTFS/etc/icpcimage-version"
+
+# 设置 ROOT 密码
+printf "root:%s\n" "$ROOT_PASSWORD" | run chpasswd
+
+# 留下一些 Python 3 的包，否则它们会被下面的 autoremove（或者是安装器的 autoremove）删掉
+# 这样就会和 https://image.icpc.global/icpc2023/pypy3.modules.txt 的列表不一致。
+# （不过这样的话，ICPC 自己的列表也应该是有问题的？）
+
+add_package python3-bcrypt python3-brlapi python3-click python3-colorama python3-dateutil python3-distro-info \
+            python3-fasteners python3-future python3-lockfile python3-monotonic \
+            python3-paramiko python3-pyatspi python3-xdg
+
+# Root authorized_keys
+# 记得换成自己的哦！
+curl -s \
+  https://github.com/taoky.keys \
+  https://github.com/cubercsl.keys \
+  https://github.com/iBug.keys \
+  https://github.com/RTXUX.keys \
+  https://github.com/yuanyiwei.keys \
+  > "$DSTROOTFS/root/.ssh/authorized_keys"
+
+# Wi-Fi，但是不能让人看到密码
+if [[ $ICPCSSID = "" ]]; then
+  echo "ICPCSSID is not set! Not adding Wi-Fi settings" >&2
+else
+  add_file /etc/netplan/02-icpc-wifi.yaml
+  sed -i "s/%ICPCSSID%/$ICPCSSID/g" "$DSTROOTFS/etc/netplan/02-icpc-wifi.yaml"
+  sed -i "s/%ICPCPASS%/$ICPCPASS/g" "$DSTROOTFS/etc/netplan/02-icpc-wifi.yaml"
+  chown root:root "$DSTROOTFS/etc/netplan/02-icpc-wifi.yaml"
+  chmod 600 "$DSTROOTFS/etc/netplan/02-icpc-wifi.yaml"
+fi
+
+# 座位号文件与桌面快捷方式
+add_file /etc/skel/Desktop/
+
+# EarlyOOM 1.7
+add_package zenity
+add_file /opt/earlyoom
+add_file /etc/default/earlyoom
+add_file /etc/earlyoom-notif.sh
+add_file /etc/systemd/system/earlyoom.service
+# run systemctl enable earlyoom
+run ln -s /etc/systemd/system/earlyoom.service /etc/systemd/system/multi-user.target.wants/earlyoom.service
+remove_package systemd-oomd
+
+# 心跳脚本
+add_package curl
+add_file /opt/heartbeat
+add_file /etc/systemd/system/heartbeat.service
+add_file /etc/systemd/system/heartbeat.timer
+add_file /etc/systemd/system/timers.target.wants/heartbeat.timer
+add_file /etc/systemd/system/heartbeat.service.d/
+
+# SUBMIT 环境变量
+add_file /etc/skel/.config/environment.d/
+add_file /etc/skel/.profile
+
+# GDM
+add_file /etc/gdm3/custom-autologin.conf
+add_file /etc/gdm3/custom-nologin.conf
+add_file /opt/set-autologin
+add_file /opt/set-nologin
+
+# 禁用 suspend
+add_file /etc/systemd/sleep.conf
+
+umount_inside_rootfs
+# 生成新的 squashfs
+chmod +w "$DST"/extracted/casper/filesystem.manifest
+run dpkg-query -W --showformat='${Package} ${Version}\n' > "$DST"/extracted/casper/filesystem.manifest
+cp "$DST"/extracted/casper/filesystem.manifest "$DST"/extracted/casper/filesystem.manifest-desktop
+sed -i '/ubiquity/d' "$DST"/extracted/casper/filesystem.manifest-desktop
+sed -i '/casper/d' "$DST"/extracted/casper/filesystem.manifest-desktop
+
+rm -f "$DST"/extracted/casper/filesystem.squashfs
+rm "$DST"/extracted/casper/filesystem.squashfs.gpg
+# 使用 zstd——文件大小似乎没有那么敏感，但是解压速度或许可以更快？
+mksquashfs "$DSTROOTFS" "$DST"/extracted/casper/filesystem.squashfs -comp zstd
+printf $(du -sx --block-size=1 "$DSTROOTFS" | cut -f1) > "$DST"/extracted/casper/filesystem.size
+# 不签名
+# gpg ...
+rm "$DST"/extracted/md5sum.txt
+find -type f -print0 "$DST"/extracted | xargs -0 md5sum | grep -v isolinux/boot.cat | tee "$DST"/extracted/md5sum.txt
+
+# 生成 ISO
+dd bs=1 count=446 if="$INPUT" of="$DST"/mbr.img
+# 先写死了（不同的 ISO skip 值可能不同）
+dd bs=512 count=8496 skip=13017544 if="$INPUT" of="$DST"/EFI.img
+
+# 也同样写死了，相关的参数可以这么获取：
+# xorriso -indev ./ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64.iso -report_el_torito cmd
+xorriso -outdev "$DST"/ubuntu-22.04.1-icpc2023-hefei-output-amd64.iso -map "$DST"/extracted / -- \
+    -volid 'ICPC Asia Hefei Regional 2023' \
+    -volume_date uuid '2023112300000000' \
+    -boot_image grub grub2_mbr="$DST"/mbr.img \
+    -boot_image any partition_table=on \
+    -boot_image any partition_cyl_align=off \
+    -boot_image any partition_offset=16 \
+    -boot_image any mbr_force_bootable=on \
+    -append_partition 2 28732ac11ff8d211ba4b00a0c93ec93b "$DST"/EFI.img \
+    -boot_image any appended_part_as=gpt \
+    -boot_image any iso_mbr_part_type=a2a0d0ebe5b9334487c068b6b72699c7 \
+    -boot_image any cat_path='/boot.catalog' \
+    -boot_image grub bin_path='/boot/grub/i386-pc/eltorito.img' \
+    -boot_image any platform_id=0x00 \
+    -boot_image any emul_type=no_emulation \
+    -boot_image any load_size=2048 \
+    -boot_image any boot_info_table=on \
+    -boot_image grub grub2_boot_info=on \
+    -boot_image any next \
+    -boot_image any efi_path='--interval:appended_partition_2_start_3254386s_size_8496d:all::' \
+    -boot_image any platform_id=0xef \
+    -boot_image any emul_type=no_emulation \
+    -boot_image any load_size=4349952
+
+sha512sum "$DST"/ubuntu-22.04.1-icpc2023-hefei-output-amd64.iso > "$DST"/ubuntu-22.04.1-icpc2023-hefei-output-amd64.iso.sha512sum

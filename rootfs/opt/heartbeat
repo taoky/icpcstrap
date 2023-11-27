@@ -1,0 +1,15 @@
+#!/bin/sh
+
+UPTIME="$(cut -d. -f1 /proc/uptime)"
+NETDEV="wlp1s0"
+test -n "$NETDEV" && MACADDR="$(tr -d : < "/sys/class/net/$NETDEV/address")"
+test -z "$MACADDR" && MACADDR="00:00:00:00:00:00"
+
+test -r /etc/icpcimage-version && VERSION="$(cat /etc/icpcimage-version)"
+test -z "$VERSION" && VERSION="$(grep -Po "version=\K\S*" /proc/cmdline)"
+test -z "$VERSION" && VERSION="devel"
+
+test -r /etc/hostname && SEATS="$(cat /etc/hostname)"
+
+exec curl -s $HEARTBEATURL -X POST \
+  -d "mac=$MACADDR&version=$VERSION&uptime=$UPTIME&seats=$SEATS"

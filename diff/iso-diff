@@ -1,0 +1,19 @@
+diff '--color=auto' -ur ubuntu-22.04.1-icpc2023-20231005-amd64/boot/grub/grub.cfg ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/boot/grub/grub.cfg
+--- ubuntu-22.04.1-icpc2023-20231005-amd64/boot/grub/grub.cfg	2023-10-06 00:26:34.000000000 +0800
++++ ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/boot/grub/grub.cfg	2023-10-25 22:26:06.000000000 +0800
+Binary files ubuntu-22.04.1-icpc2023-20231005-amd64/boot/grub/i386-pc/eltorito.img and ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/boot/grub/i386-pc/eltorito.img differ
+Binary files ubuntu-22.04.1-icpc2023-20231005-amd64/boot.catalog and ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/boot.catalog differ
+diff '--color=auto' -ur ubuntu-22.04.1-icpc2023-20231005-amd64/casper/filesystem.size ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/casper/filesystem.size
+--- ubuntu-22.04.1-icpc2023-20231005-amd64/casper/filesystem.size	2023-10-06 01:16:04.000000000 +0800
++++ ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/casper/filesystem.size	2023-10-25 22:36:40.000000000 +0800
+Binary files ubuntu-22.04.1-icpc2023-20231005-amd64/casper/filesystem.squashfs and ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/casper/filesystem.squashfs differ
+Binary files ubuntu-22.04.1-icpc2023-20231005-amd64/casper/filesystem.squashfs.gpg and ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/casper/filesystem.squashfs.gpg differ
+diff '--color=auto' -ur ubuntu-22.04.1-icpc2023-20231005-amd64/md5sum.txt ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/md5sum.txt
+--- ubuntu-22.04.1-icpc2023-20231005-amd64/md5sum.txt	2023-10-06 01:16:23.000000000 +0800
++++ ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/md5sum.txt	2023-10-25 23:10:25.000000000 +0800
+diff '--color=auto' -ur ubuntu-22.04.1-icpc2023-20231005-amd64/preseed/contest-nvme.seed ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/preseed/contest-nvme.seed
+--- ubuntu-22.04.1-icpc2023-20231005-amd64/preseed/contest-nvme.seed	2023-10-06 00:26:34.000000000 +0800
++++ ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/preseed/contest-nvme.seed	2023-10-25 22:13:10.000000000 +0800
+diff '--color=auto' -ur ubuntu-22.04.1-icpc2023-20231005-amd64/preseed/contest.seed ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/preseed/contest.seed
+--- ubuntu-22.04.1-icpc2023-20231005-amd64/preseed/contest.seed	2023-10-06 00:26:34.000000000 +0800
++++ ubuntu-22.04.1-icpc2023-nanjing-20231025-amd64/preseed/contest.seed	2023-10-25 22:13:41.000000000 +0800

@@ -1,0 +1,53 @@
+File icpc2023-original-1005/squashfs-root/dev/console is a character special file while file icpc2023-nanjing/squashfs-root/dev/console is a character special file
+File icpc2023-original-1005/squashfs-root/dev/full is a character special file while file icpc2023-nanjing/squashfs-root/dev/full is a character special file
+File icpc2023-original-1005/squashfs-root/dev/null is a character special file while file icpc2023-nanjing/squashfs-root/dev/null is a character special file
+File icpc2023-original-1005/squashfs-root/dev/ptmx is a character special file while file icpc2023-nanjing/squashfs-root/dev/ptmx is a character special file
+File icpc2023-original-1005/squashfs-root/dev/random is a character special file while file icpc2023-nanjing/squashfs-root/dev/random is a character special file
+File icpc2023-original-1005/squashfs-root/dev/tty is a character special file while file icpc2023-nanjing/squashfs-root/dev/tty is a character special file
+File icpc2023-original-1005/squashfs-root/dev/urandom is a character special file while file icpc2023-nanjing/squashfs-root/dev/urandom is a character special file
+File icpc2023-original-1005/squashfs-root/dev/zero is a character special file while file icpc2023-nanjing/squashfs-root/dev/zero is a character special file
+diff -ur icpc2023-original-1005/squashfs-root/etc/ca-certificates.conf icpc2023-nanjing/squashfs-root/etc/ca-certificates.conf
+--- icpc2023-original-1005/squashfs-root/etc/ca-certificates.conf	2022-12-22 03:10:59.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/etc/ca-certificates.conf	2023-10-23 20:51:54.000000000 +0800
+diff -ur icpc2023-original-1005/squashfs-root/etc/group icpc2023-nanjing/squashfs-root/etc/group
+--- icpc2023-original-1005/squashfs-root/etc/group	2023-10-06 00:26:34.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/etc/group	2023-10-23 21:23:07.000000000 +0800
+diff -ur icpc2023-original-1005/squashfs-root/etc/group- icpc2023-nanjing/squashfs-root/etc/group-
+--- icpc2023-original-1005/squashfs-root/etc/group-	2022-12-21 22:00:50.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/etc/group-	2023-10-06 00:26:34.000000000 +0800
+diff -ur icpc2023-original-1005/squashfs-root/etc/gshadow icpc2023-nanjing/squashfs-root/etc/gshadow
+--- icpc2023-original-1005/squashfs-root/etc/gshadow	2022-12-21 22:05:20.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/etc/gshadow	2023-10-23 21:23:07.000000000 +0800
+diff -ur icpc2023-original-1005/squashfs-root/etc/gshadow- icpc2023-nanjing/squashfs-root/etc/gshadow-
+--- icpc2023-original-1005/squashfs-root/etc/gshadow-	2022-12-21 22:00:50.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/etc/gshadow-	2022-12-21 22:05:20.000000000 +0800
+Only in icpc2023-nanjing/squashfs-root/etc/netplan: 01-dhcp-all.yaml
+Only in icpc2023-original-1005/squashfs-root/etc/netplan: 01-network-manager-all.yaml
+Only in icpc2023-nanjing/squashfs-root/etc/ssl/certs: 10bab341.0
+diff -ur icpc2023-original-1005/squashfs-root/etc/ssl/certs/ca-certificates.crt icpc2023-nanjing/squashfs-root/etc/ssl/certs/ca-certificates.crt
+--- icpc2023-original-1005/squashfs-root/etc/ssl/certs/ca-certificates.crt	2023-09-26 03:23:23.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/etc/ssl/certs/ca-certificates.crt	2023-10-23 21:09:10.000000000 +0800
+Only in icpc2023-nanjing/squashfs-root/etc/ssl/certs: ICPC_China_Root_CA.pem
+Binary files icpc2023-original-1005/squashfs-root/etc/ssl/certs/java/cacerts and icpc2023-nanjing/squashfs-root/etc/ssl/certs/java/cacerts differ
+Only in icpc2023-original-1005/squashfs-root/etc/systemd/system/multi-user.target.wants: detect-network-interfaces.service
+Only in icpc2023-nanjing/squashfs-root/etc/systemd/system/multi-user.target.wants: systemd-networkd.service
+Only in icpc2023-nanjing/squashfs-root/etc/xdg/autostart: webrtc-grabber.desktop
+Only in icpc2023-nanjing/squashfs-root/home: cubercsl
+diff -ur icpc2023-original-1005/squashfs-root/lib/firefox/distribution/policies.json icpc2023-nanjing/squashfs-root/lib/firefox/distribution/policies.json
+--- icpc2023-original-1005/squashfs-root/lib/firefox/distribution/policies.json	2022-11-24 04:29:31.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/lib/firefox/distribution/policies.json	2023-10-25 20:37:34.000000000 +0800
+Only in icpc2023-nanjing/squashfs-root/opt: grabber
+diff -ur icpc2023-original-1005/squashfs-root/root/.lesshst icpc2023-nanjing/squashfs-root/root/.lesshst
+--- icpc2023-original-1005/squashfs-root/root/.lesshst	2022-12-21 23:04:40.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/root/.lesshst	2023-10-25 20:34:33.000000000 +0800
+diff -ur icpc2023-original-1005/squashfs-root/root/.ssh/authorized_keys2 icpc2023-nanjing/squashfs-root/root/.ssh/authorized_keys2
+--- icpc2023-original-1005/squashfs-root/root/.ssh/authorized_keys2	2022-11-24 04:29:27.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/root/.ssh/authorized_keys2	2023-10-23 21:22:27.000000000 +0800
+Only in icpc2023-nanjing/squashfs-root/root: .viminfo
+diff -ur icpc2023-original-1005/squashfs-root/usr/lib/firefox/distribution/policies.json icpc2023-nanjing/squashfs-root/usr/lib/firefox/distribution/policies.json
+--- icpc2023-original-1005/squashfs-root/usr/lib/firefox/distribution/policies.json	2022-11-24 04:29:31.000000000 +0800
++++ icpc2023-nanjing/squashfs-root/usr/lib/firefox/distribution/policies.json	2023-10-25 20:37:34.000000000 +0800
+Only in icpc2023-nanjing/squashfs-root/usr/local/bin: grabber
+Only in icpc2023-original-1005/squashfs-root/usr/local/bin: printfile
+Only in icpc2023-nanjing/squashfs-root/usr/local/bin: submit
+Only in icpc2023-nanjing/squashfs-root/usr/share/ca-certificates: ICPC_China_Root_CA.crt
